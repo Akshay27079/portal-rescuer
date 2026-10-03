@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "Portal Rescuer",
+  "version": "1.0.0",
+  "description": "Auto-saves your form progress, recovers sessions, and retries failed submissions on government portals — so you never lose your work again.",
+  "author": "Portal Rescuer Team",
+
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "tabs",
+    "scripting",
+    "webRequest"
+  ],
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
+
+  "background": {
+    "service_worker": "src/background/service_worker.js",
+    "type": "module"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "src/storage/db.js",
+        "src/utils/helpers.js",
+        "src/content/form_scanner.js",
+        "src/content/autosave.js",
+        "src/content/refill.js",
+        "src/overlay/injector.js",
+        "src/content/main.js"
+      ],
+      "css": ["assets/styles/overlay.css"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Portal Rescuer",
+    "default_icon": {
+      "16":  "assets/icons/icon16.png",
+      "32":  "assets/icons/icon32.png",
+      "48":  "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16":  "assets/icons/icon16.png",
+    "32":  "assets/icons/icon32.png",
+    "48":  "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/styles/overlay.css",
+        "assets/icons/*.png",
+        "src/overlay/overlay.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

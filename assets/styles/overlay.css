@@ -1,0 +1,53 @@
+/*
+ * overlay.css — Injected into portal pages by content_scripts.
+ *
+ * This file is intentionally minimal. It only styles elements that Portal
+ * Rescuer adds to the HOST page (not the Shadow DOM — that CSS lives inside
+ * injector.js). The #portal-rescuer-overlay-host element itself is zero-size
+ * so it never affects portal layout.
+ *
+ * The main purpose here is the .pr-restored field highlight animation,
+ * which must live in the host page's stylesheet because it targets portal
+ * form elements (not shadow DOM elements).
+ */
+
+/* ── Field restore highlight ───────────────────────────────────────────────
+   Applied by refill.js when a field is filled from a saved snapshot.
+   Uses !important only where strictly needed to override portal styles.
+────────────────────────────────────────────────────────────────────────── */
+.pr-restored {
+  outline:        2px solid #17a589 !important;
+  outline-offset: 2px !important;
+  animation:      pr-restore-flash 2.5s ease forwards !important;
+}
+
+@keyframes pr-restore-flash {
+  0%   {
+    outline-color:    #17a589;
+    background-color: rgba(23, 165, 137, 0.12);
+  }
+  60%  {
+    outline-color:    #17a589;
+    background-color: rgba(23, 165, 137, 0.06);
+  }
+  100% {
+    outline-color:    transparent;
+    background-color: transparent;
+  }
+}
+
+/* ── Overlay host element ──────────────────────────────────────────────────
+   The shadow DOM host is rendered with zero footprint so it never shifts
+   portal layout, clips content, or receives stray pointer events.
+────────────────────────────────────────────────────────────────────────── */
+#portal-rescuer-overlay-host {
+  position:       fixed !important;
+  top:            0 !important;
+  left:           0 !important;
+  width:          0 !important;
+  height:         0 !important;
+  overflow:       visible !important;
+  z-index:        2147483647 !important;
+  pointer-events: none !important;
+  /* No display:none — we need the shadow DOM to render */
+}

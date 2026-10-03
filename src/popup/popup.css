@@ -1,0 +1,396 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   popup.css — Portal Rescuer popup styles
+   Design goals: clean, accessible, government-trust palette (navy + teal),
+   compact enough to fit comfortably in a 380×560 extension popup.
+───────────────────────────────────────────────────────────────────────── */
+
+/* ── Reset & tokens ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --clr-bg:          #f4f6f9;
+  --clr-surface:     #ffffff;
+  --clr-border:      #dde2ea;
+  --clr-primary:     #1a5276;   /* deep navy */
+  --clr-primary-lt:  #2e86c1;
+  --clr-accent:      #17a589;   /* teal */
+  --clr-danger:      #c0392b;
+  --clr-warn:        #d68910;
+  --clr-success:     #1e8449;
+  --clr-text:        #1c2833;
+  --clr-text-muted:  #717d8a;
+  --clr-highlight:   #eaf4fb;
+
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg: 12px;
+
+  --shadow-card: 0 1px 4px rgba(0,0,0,.10), 0 0 0 1px var(--clr-border);
+
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "Consolas", "Cascadia Code", monospace;
+
+  --popup-w: 380px;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+html { font-size: 14px; }
+
+body {
+  width:       var(--popup-w);
+  min-height:  200px;
+  max-height:  580px;
+  overflow-y:  auto;
+  font-family: var(--font);
+  color:       var(--clr-text);
+  background:  var(--clr-bg);
+  display:     flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--clr-border); border-radius: 99px; }
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.pr-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         10px 14px;
+  background:      var(--clr-primary);
+  color:           #fff;
+  flex-shrink:     0;
+}
+
+.pr-header__logo {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+}
+
+.pr-header__title {
+  font-size:   15px;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+/* ── Status badge ────────────────────────────────────────────────────────── */
+.pr-badge {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           5px;
+  padding:       2px 8px;
+  border-radius: 99px;
+  font-size:     11px;
+  font-weight:   600;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.pr-badge--active   { background: rgba(23,165,137,.25); color: #a9dfbf; }
+.pr-badge--inactive { background: rgba(255,255,255,.15); color: rgba(255,255,255,.7); }
+
+.pr-badge--active::before,
+.pr-badge--inactive::before {
+  content:        "";
+  display:        inline-block;
+  width:          6px;
+  height:         6px;
+  border-radius:  50%;
+}
+.pr-badge--active::before   { background: #2ecc71; box-shadow: 0 0 0 2px rgba(46,204,113,.3); }
+.pr-badge--inactive::before { background: #bdc3c7; }
+
+/* ── Sections ────────────────────────────────────────────────────────────── */
+.pr-section {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--clr-border);
+}
+.pr-section:last-of-type { border-bottom: none; }
+
+.pr-section__title {
+  font-size:   11px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color:       var(--clr-text-muted);
+  margin-bottom: 8px;
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+}
+
+/* ── Count pill ──────────────────────────────────────────────────────────── */
+.pr-count {
+  display:       inline-flex;
+  align-items:   center;
+  justify-content: center;
+  min-width:     18px;
+  height:        18px;
+  padding:       0 5px;
+  background:    var(--clr-primary-lt);
+  color:         #fff;
+  border-radius: 99px;
+  font-size:     10px;
+  font-weight:   700;
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+.pr-card {
+  background:    var(--clr-surface);
+  border-radius: var(--radius-md);
+  box-shadow:    var(--shadow-card);
+  padding:       10px 12px;
+}
+
+.pr-card--current { border-left: 3px solid var(--clr-accent); }
+
+.pr-card__row {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     baseline;
+  gap:             8px;
+  padding:         3px 0;
+}
+
+.pr-card__label {
+  font-size:  12px;
+  color:      var(--clr-text-muted);
+  flex-shrink: 0;
+}
+
+.pr-card__value {
+  font-size:   12px;
+  font-weight: 500;
+  text-align:  right;
+  color:       var(--clr-text);
+}
+
+.pr-truncate {
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  max-width:     200px;
+}
+
+.pr-card__actions {
+  display:   flex;
+  gap:       8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--clr-border);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.pr-btn {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           4px;
+  padding:       6px 12px;
+  border:        none;
+  border-radius: var(--radius-sm);
+  font:          600 12px var(--font);
+  cursor:        pointer;
+  transition:    background .15s, opacity .15s;
+  white-space:   nowrap;
+}
+.pr-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.pr-btn--primary {
+  background: var(--clr-accent);
+  color:      #fff;
+  flex: 1;
+}
+.pr-btn--primary:hover:not(:disabled) { background: #14907a; }
+
+.pr-btn--danger {
+  background: #fdf0ef;
+  color:      var(--clr-danger);
+  border:     1px solid #f5c6c3;
+}
+.pr-btn--danger:hover:not(:disabled) { background: #fad7d4; }
+
+.pr-btn--ghost {
+  background: transparent;
+  color:      var(--clr-text-muted);
+  border:     1px solid var(--clr-border);
+}
+.pr-btn--ghost:hover:not(:disabled) { background: var(--clr-border); color: var(--clr-text); }
+
+.pr-btn--sm { padding: 4px 9px; font-size: 11px; }
+
+/* ── Job list (retry queue) ──────────────────────────────────────────────── */
+.pr-job-list,
+.pr-session-list {
+  list-style: none;
+  display:    flex;
+  flex-direction: column;
+  gap:        6px;
+  margin-bottom: 8px;
+}
+
+.pr-job {
+  background:    var(--clr-surface);
+  border-radius: var(--radius-md);
+  box-shadow:    var(--shadow-card);
+  padding:       8px 10px;
+  display:       flex;
+  flex-direction: column;
+  gap:           4px;
+}
+
+.pr-job__top {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+}
+
+.pr-job__url {
+  font-size:     11px;
+  font-family:   var(--font-mono);
+  color:         var(--clr-text-muted);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  max-width:     220px;
+}
+
+.pr-job__status {
+  font-size:  10px;
+  font-weight: 700;
+  padding:    2px 6px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  flex-shrink: 0;
+}
+
+.pr-job__status--pending   { background: #fef9e7; color: var(--clr-warn); }
+.pr-job__status--retrying  { background: #eaf4fb; color: var(--clr-primary-lt); }
+.pr-job__status--succeeded { background: #eafaf1; color: var(--clr-success); }
+.pr-job__status--failed    { background: #fdedec; color: var(--clr-danger); }
+.pr-job__status--cancelled { background: var(--clr-bg); color: var(--clr-text-muted); }
+
+.pr-job__meta {
+  font-size: 11px;
+  color:     var(--clr-text-muted);
+}
+
+.pr-job__actions {
+  display:   flex;
+  gap:       6px;
+  margin-top: 4px;
+}
+
+/* ── Session list ────────────────────────────────────────────────────────── */
+.pr-session-item {
+  background:    var(--clr-surface);
+  border-radius: var(--radius-md);
+  box-shadow:    var(--shadow-card);
+  padding:       8px 10px;
+  display:       flex;
+  justify-content: space-between;
+  align-items:   center;
+  gap:           8px;
+}
+
+.pr-session-item__info {
+  display:   flex;
+  flex-direction: column;
+  gap:       2px;
+  overflow:  hidden;
+}
+
+.pr-session-item__title {
+  font-size:     12px;
+  font-weight:   600;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  max-width:     220px;
+}
+
+.pr-session-item__meta {
+  font-size: 11px;
+  color:     var(--clr-text-muted);
+}
+
+.pr-session-item__actions {
+  display:    flex;
+  gap:        4px;
+  flex-shrink: 0;
+}
+
+/* ── Empty states ────────────────────────────────────────────────────────── */
+.pr-empty {
+  font-size:  12px;
+  color:      var(--clr-text-muted);
+  text-align: center;
+  padding:    8px 0;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.pr-footer {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         8px 14px;
+  border-top:      1px solid var(--clr-border);
+  background:      var(--clr-surface);
+  flex-shrink:     0;
+}
+
+.pr-version {
+  font-size: 11px;
+  color:     var(--clr-text-muted);
+}
+
+/* ── Toasts ──────────────────────────────────────────────────────────────── */
+.pr-toast-container {
+  position:       fixed;
+  bottom:         12px;
+  left:           50%;
+  transform:      translateX(-50%);
+  display:        flex;
+  flex-direction: column;
+  gap:            6px;
+  z-index:        9999;
+  width:          calc(var(--popup-w) - 28px);
+  pointer-events: none;
+}
+
+.pr-toast {
+  background:    var(--clr-text);
+  color:         #fff;
+  padding:       8px 12px;
+  border-radius: var(--radius-md);
+  font-size:     12px;
+  font-weight:   500;
+  box-shadow:    0 4px 12px rgba(0,0,0,.25);
+  animation:     pr-toast-in .2s ease;
+  pointer-events: auto;
+}
+
+.pr-toast--success { background: var(--clr-success); }
+.pr-toast--error   { background: var(--clr-danger);  }
+.pr-toast--warning { background: var(--clr-warn);    }
+
+@keyframes pr-toast-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+.pr-spinner {
+  display:       inline-block;
+  width:         12px;
+  height:        12px;
+  border:        2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation:     pr-spin .6s linear infinite;
+  vertical-align: middle;
+}
+@keyframes pr-spin { to { transform: rotate(360deg); } }
