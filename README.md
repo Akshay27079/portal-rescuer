@@ -49,7 +49,7 @@ Portal Rescuer injects a clean, unobtrusive UI layer over any web page. It doesn
 ### 1. Download or Clone
 
 ```bash
-git clone https://github.com/your-org/portal-rescuer.git
+git clone https://github.com/Akshay27079/portal-rescuer.git
 # or download and unzip the release
 ```
 
