@@ -84,11 +84,14 @@ window.PortalRescuer.autosave = (() => {
 
   /** ── Persist a single field immediately ── */
   async function _saveField(key, value) {
+    window.dispatchEvent(new CustomEvent("pr:saving"));
     try {
       await window.PortalRescuer.db.saveField(_sessionKey, key, value);
+      window.dispatchEvent(new CustomEvent("pr:saved"));
       _notifyBackground("FIELD_SAVED", { sessionKey: _sessionKey, key, ts: Date.now() });
     } catch (err) {
       console.warn("[PortalRescuer] Field save failed:", err);
+      window.dispatchEvent(new CustomEvent("pr:error"));
     }
   }
 

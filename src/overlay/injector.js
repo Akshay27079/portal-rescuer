@@ -36,7 +36,7 @@ window.PortalRescuer.overlay = (() => {
       height:      "0",
       overflow:    "visible",
       zIndex:      "2147483647",  // max z-index
-      pointerEvents: "none",
+      pointerEvents: "auto",
     });
 
     _shadowRoot = _host.attachShadow({ mode: "open" });
@@ -519,12 +519,12 @@ window.PortalRescuer.overlay = (() => {
       font-family:   var(--pr-font);
       font-size:     13px;
       color:         var(--pr-text);
-      pointer-events: all;
+      pointer-events: none;
       transform-origin: bottom right;
       transform:     scale(.85);
       opacity:       0;
       transition:    transform .2s cubic-bezier(.22,1,.36,1), opacity .2s;
-      pointer-events: none;
+      
       z-index:       2147483646;
       overflow:      hidden;
     }
