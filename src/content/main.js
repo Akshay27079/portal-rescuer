@@ -1,131 +1,120 @@
 /**
  * main.js — Content script entry point.
- *
- * Orchestrates the full lifecycle:
- *  1. Restore any previously saved session (refill).
- *  2. Start auto-save on all form fields.
- *  3. Intercept form submissions → flush + hand to background retry queue.
- *  4. Listen for messages from popup / background.
- *  5. Handle SPA navigation (hashchange / popstate).
+ * Runs last in the load order.
  */
 
 window.PortalRescuer = window.PortalRescuer || {};
 
 (async () => {
-  // Guard: only run once per frame
-  if (window.PortalRescuer._mainLoaded) return;
-  window.PortalRescuer._mainLoaded = true;
+  if (window.PortalRescuer._ready) return;
+  window.PortalRescuer._ready = true;
 
-  const { getPageKey } = window.PortalRescuer.helpers;
-  const autosave       = window.PortalRescuer.autosave;
-  const refill         = window.PortalRescuer.refill;
-  const overlay        = window.PortalRescuer.overlay;
+  const { autosave, refill, overlay } = window.PortalRescuer;
 
-  // ── Step 1: Restore saved session ──────────────────────────────────────
+  // 1. Restore any previously saved session
   await refill.restore();
 
-  // ── Step 2: Start auto-save ────────────────────────────────────────────
+  // 2. Start auto-saving
   autosave.init();
 
-  // ── Step 3: Intercept form submissions ────────────────────────────────
-  _interceptForms();
+  // 3. Intercept form submissions
+  _watchForms();
 
-  // ── Step 4: Listen for extension messages ─────────────────────────────
-  chrome.runtime.onMessage.addListener(_handleMessage);
+  // 4. Handle messages from popup / background
+  chrome.runtime.onMessage.addListener(_onMessage);
 
-  // ── Step 5: SPA nav re-init ────────────────────────────────────────────
-  window.addEventListener("hashchange",  _onNavChange);
-  window.addEventListener("popstate",    _onNavChange);
+  // 5. SPA navigation
+  window.addEventListener("hashchange", _onNav);
+  window.addEventListener("popstate",   _onNav);
 
-  console.info("[PortalRescuer] Content script ready on:", location.href);
+  console.info("[PortalRescuer] Ready on:", location.href);
 
-  // ────────────────────────────────────────────────────────────────────────
+  // ──────────────────────────────────────────────────────────────────────────
 
-  /** Intercept all <form> submit events on the page */
-  function _interceptForms() {
-    // Current forms
-    document.querySelectorAll("form").forEach(_addSubmitListener);
+  const _seen = new WeakSet();
 
-    // Future forms (dynamic portals add forms after load)
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-          if (node.nodeType !== Node.ELEMENT_NODE) continue;
-          if (node.tagName === "FORM") _addSubmitListener(node);
-          node.querySelectorAll?.("form").forEach(_addSubmitListener);
+  function _watchForms() {
+    document.querySelectorAll("form").forEach(_addSubmit);
+    new MutationObserver((muts) => {
+      for (const m of muts) {
+        for (const n of m.addedNodes) {
+          if (n.nodeType !== 1) continue;
+          if (n.tagName === "FORM") _addSubmit(n);
+          n.querySelectorAll?.("form").forEach(_addSubmit);
         }
       }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    }).observe(document.body, { childList: true, subtree: true });
   }
 
-  const _listenedForms = new WeakSet();
-
-  function _addSubmitListener(form) {
-    if (_listenedForms.has(form)) return;
-    _listenedForms.add(form);
-
-    form.addEventListener("submit", async (evt) => {
-      // Flush the latest snapshot before the page navigates away
+  function _addSubmit(form) {
+    if (_seen.has(form)) return;
+    _seen.add(form);
+    form.addEventListener("submit", async () => {
       await autosave.forceFlush();
-
-      // Notify background to start monitoring for errors on the next page
-      chrome.runtime.sendMessage({
-        type:       "FORM_SUBMITTED",
-        sessionKey: autosave.getSessionKey(),
-        formAction: form.action,
-        formMethod: form.method || "GET",
-        snapshot:   autosave.getSnapshot(),
-        ts:         Date.now(),
-      });
-    }, { capture: true }); // capture phase so we run before portal's own handlers
+      try {
+        chrome.runtime.sendMessage({
+          type:       "FORM_SUBMITTED",
+          sessionKey: autosave.getSessionKey(),
+          formAction: form.action,
+          formMethod: form.method || "GET",
+          snapshot:   autosave.getSnapshot(),
+          ts:         Date.now(),
+        });
+      } catch (_) {}
+    }, { capture: true });
   }
 
-  /** Handle messages from popup or background */
-  function _handleMessage(msg, _sender, sendResponse) {
+  function _onMessage(msg, _sender, respond) {
     switch (msg.type) {
       case "GET_STATUS":
-        sendResponse({
+        respond({
           sessionKey: autosave.getSessionKey(),
           snapshot:   autosave.getSnapshot(),
           pageTitle:  document.title,
           pageUrl:    location.href,
+          lastSaved:  autosave.getLastSaved?.() ?? null,
         });
         break;
 
       case "FORCE_REFILL":
-        refill.fillFromSnapshot(msg.snapshot).then(result => sendResponse(result));
-        return true; // async response
+        refill.fillFromSnapshot(msg.snapshot).then(respond);
+        return true;
 
       case "DISCARD_SESSION":
-        refill.discardSession(msg.sessionKey).then(() => sendResponse({ ok: true }));
+        refill.discardSession(msg.sessionKey).then(() => respond({ ok: true }));
         return true;
 
       case "SHOW_OVERLAY":
         overlay?.showPanel();
-        sendResponse({ ok: true });
+        respond({ ok: true });
         break;
 
       case "HIDE_OVERLAY":
         overlay?.hidePanel();
-        sendResponse({ ok: true });
+        respond({ ok: true });
+        break;
+
+      case "REPLAY_SUBMISSION":
+        // Background asked us to replay — re-fill and re-submit the form
+        refill.fillFromSnapshot(msg.snapshot).then(() => {
+          const form = document.querySelector("form");
+          if (form) form.submit();
+        });
+        respond({ ok: true });
         break;
 
       default:
-        break;
+        respond({ ok: false });
     }
   }
 
-  /** Re-run on SPA navigation */
-  async function _onNavChange() {
-    // Small delay for the new page to render
+  async function _onNav() {
     await new Promise(r => setTimeout(r, 800));
     autosave.destroy();
-    window.PortalRescuer._mainLoaded = false;
-    // Re-bootstrap (re-entry point)
+    window.PortalRescuer._ready = false;
     await refill.restore();
     autosave.init();
-    _interceptForms();
-    window.PortalRescuer._mainLoaded = true;
+    _watchForms();
+    window.PortalRescuer._ready = true;
   }
 })();
