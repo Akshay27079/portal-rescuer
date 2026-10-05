@@ -53,7 +53,7 @@ window.PortalRescuer.overlay = (() => {
     _fab = document.createElement("button");
     _fab.className = "fab";
     _fab.title     = "Portal Rescuer";
-    _fab.innerHTML = "🛡";
+    _fab.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6L12 2z" fill="white"/></svg>`;
     _fab.addEventListener("click", togglePanel);
     root.appendChild(_fab);
 
@@ -62,8 +62,8 @@ window.PortalRescuer.overlay = (() => {
     _panel.className = "panel";
     _panel.innerHTML = `
       <div class="panel-head">
-        <span>🛡 Portal Rescuer</span>
-        <button class="close-btn" id="pr-close">✕</button>
+        <span>Portal Rescuer</span>
+        <button class="close-btn" id="pr-close">&#x2715;</button>
       </div>
       <div class="panel-body">
         <div class="row"><span class="lbl">Status</span>     <span class="val" id="pr-status">Watching</span></div>

@@ -90,8 +90,8 @@ async function _refreshQueue() {
 
 async function _refreshSessions() {
   try {
-    // Only fetch keys that start with pr_snapshot_
-    const all = await _store(null);
+    // chrome.storage.local.get(null) fetches everything — works in all versions
+    const all = await new Promise(r => chrome.storage.local.get(null, r));
     _sessions = Object.entries(all || {})
       .filter(([k]) => k.startsWith("pr_snapshot_"))
       .map(([, v]) => v)

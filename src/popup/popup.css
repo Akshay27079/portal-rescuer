@@ -394,3 +394,5 @@ body {
   vertical-align: middle;
 }
 @keyframes pr-spin { to { transform: rotate(360deg); } }
+
+.pr-link { font-size: 11px; color: var(--clr-text-muted); text-decoration: none; } .pr-link:hover { text-decoration: underline; }

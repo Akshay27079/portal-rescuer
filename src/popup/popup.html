@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Portal Rescuer</title>
-  <link rel="stylesheet" href="popup.css" />
+  <link rel="stylesheet" href="popup.css"/>
 </head>
 <body>
 
-  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <!-- Header -->
   <header class="pr-header">
     <div class="pr-header__logo">
-      <img src="../../assets/icons/icon32.png" alt="Portal Rescuer" width="24" height="24" />
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6L12 2z"
+              fill="#17a589" stroke="#17a589" stroke-width="0.5"/>
+      </svg>
       <span class="pr-header__title">Portal Rescuer</span>
     </div>
-    <div class="pr-header__badge" id="statusBadge" title="Extension status">
+    <div id="statusBadge">
       <span class="pr-badge pr-badge--active">Active</span>
     </div>
   </header>
 
-  <!-- ── Current page panel ─────────────────────────────────────── -->
-  <section class="pr-section" id="currentPageSection">
+  <!-- Current Page -->
+  <section class="pr-section">
     <h2 class="pr-section__title">Current Page</h2>
 
     <div class="pr-card pr-card--current" id="currentPageCard">
@@ -36,14 +39,9 @@
         <span class="pr-card__label">Last saved</span>
         <span class="pr-card__value" id="currentLastSaved">—</span>
       </div>
-
       <div class="pr-card__actions">
-        <button class="pr-btn pr-btn--primary" id="btnForceRefill" title="Refill form fields from the last saved snapshot">
-          ↩ Restore Fields
-        </button>
-        <button class="pr-btn pr-btn--danger" id="btnDiscardSession" title="Delete saved data for this page">
-          🗑 Discard
-        </button>
+        <button class="pr-btn pr-btn--primary" id="btnForceRefill">↩ Restore Fields</button>
+        <button class="pr-btn pr-btn--danger"  id="btnDiscardSession">🗑 Discard</button>
       </div>
     </div>
 
@@ -52,43 +50,31 @@
     </p>
   </section>
 
-  <!-- ── Retry queue ────────────────────────────────────────────── -->
-  <section class="pr-section" id="retrySection">
+  <!-- Retry Queue -->
+  <section class="pr-section">
     <h2 class="pr-section__title">
-      Retry Queue
-      <span class="pr-count" id="retryCount">0</span>
+      Retry Queue <span class="pr-count" id="retryCount">0</span>
     </h2>
-
-    <ul class="pr-job-list" id="retryJobList" aria-label="Retry jobs"></ul>
-
+    <ul class="pr-job-list" id="retryJobList"></ul>
     <p class="pr-empty" id="noRetryJobs">All clear — no pending retries.</p>
-
-    <button class="pr-btn pr-btn--ghost pr-btn--sm" id="btnClearSucceeded">
-      Clear completed
-    </button>
+    <button class="pr-btn pr-btn--ghost pr-btn--sm" id="btnClearSucceeded">Clear completed</button>
   </section>
 
-  <!-- ── Saved sessions ─────────────────────────────────────────── -->
-  <section class="pr-section" id="sessionsSection">
+  <!-- Saved Sessions -->
+  <section class="pr-section">
     <h2 class="pr-section__title">
-      Saved Sessions
-      <span class="pr-count" id="sessionCount">0</span>
+      Saved Sessions <span class="pr-count" id="sessionCount">0</span>
     </h2>
-
-    <ul class="pr-session-list" id="sessionList" aria-label="Saved sessions"></ul>
-
+    <ul class="pr-session-list" id="sessionList"></ul>
     <p class="pr-empty" id="noSessions">No saved sessions yet.</p>
   </section>
 
-  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <!-- Footer -->
   <footer class="pr-footer">
-    <button class="pr-btn pr-btn--ghost pr-btn--sm" id="btnOpenOptions">
-      ⚙ Settings
-    </button>
-    <span class="pr-version">v1.0.0</span>
+    <span class="pr-version">v1.1.0</span>
+    <a href="https://github.com/Akshay27079/portal-rescuer" target="_blank" class="pr-link">GitHub</a>
   </footer>
 
-  <!-- ── Toast container ────────────────────────────────────────── -->
   <div class="pr-toast-container" id="toastContainer" aria-live="polite"></div>
 
   <script src="popup.js"></script>
